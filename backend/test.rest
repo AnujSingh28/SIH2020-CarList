@@ -1,0 +1,11 @@
+GET http://localhost:4000/carList
+
+###
+POST http://localhost:4000/carList
+Content-Type: application/json
+
+{
+    "name" : "Maserati",
+    "fuelType":  "Petrol",
+    "fuelTankSize" : "finite"
+}
