@@ -5,7 +5,9 @@ POST http://localhost:4000/carList
 Content-Type: application/json
 
 {
-    "name" : "Maserati",
+    "name" : "jazz",
     "fuelType":  "Petrol",
-    "fuelTankSize" : "finite"
+    "fuelTankSize" : "100L",
+    "completedJourney" : 4,
+    "distanceCovered" : 100
 }

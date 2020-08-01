@@ -2,57 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Vehicle {
-
   final String carName;
   final String lastTravelled;
   final IconData icon;
+  final num completedJourney;
+  final num distanceCovered;
 
   Vehicle({
     this.carName = 'Car',
     this.lastTravelled = 'Never',
     this.icon = FontAwesomeIcons.car,
+    this.completedJourney = 0,
+    this.distanceCovered = 0,
   });
 
-  Widget getVehicleAsListItem({bool selectedVehicle = false, bool expandedVehicleDetails = false}) {
+  Widget getVehicleAsListItem(
+      {bool selectedVehicle = false, bool expandedVehicleDetails = false}) {
     return VehicleListItem(
       backgroundColor: selectedVehicle ? Color(0xff369df7) : Colors.white,
       titleColor: selectedVehicle ? Colors.white : Colors.black,
       icon: icon,
       title: carName,
-      elevation:  selectedVehicle ? 5.0 : 0.0,
+      elevation: selectedVehicle ? 5.0 : 0.0,
       subtext1: 'Last Travelled - $lastTravelled',
       subtextColor: selectedVehicle ? Colors.white : Colors.grey.shade600,
-      bottomWidget: selectedVehicle && expandedVehicleDetails ? Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Journey\'s Completed - 20',
-                style: TextStyle(
-                  fontSize: 20.0,
-                  color: Colors.lightGreen.shade100
-                ),
-              ),Text(
-                'Distance Covered - 300 Km',
-                style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.lightGreen.shade100
+      bottomWidget: selectedVehicle && expandedVehicleDetails
+          ? Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Journey\'s Completed - $completedJourney',
+                      style: TextStyle(
+                          fontSize: 20.0, color: Colors.lightGreen.shade100),
+                    ),
+                    Text(
+                      'Distance Covered - $distanceCovered Km',
+                      style: TextStyle(
+                          fontSize: 20.0, color: Colors.lightGreen.shade100),
+                    ),
+                    Text(
+                      'Fuel Saved - 10L',
+                      style: TextStyle(
+                          fontSize: 20.0, color: Colors.lightGreen.shade100),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                'Fuel Saved - 10L',
-                style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.lightGreen.shade100
-                ),
-              ),
-            ],
-          ),
-        ),
-      ) : null,
+            )
+          : null,
     );
   }
 }
@@ -67,7 +68,6 @@ class VehicleListItem extends StatelessWidget {
   final Color subtextColor;
   final Widget bottomWidget;
 
-
   VehicleListItem({
     this.backgroundColor = Colors.white,
     this.titleColor = Colors.black,
@@ -77,7 +77,7 @@ class VehicleListItem extends StatelessWidget {
     this.subtext1,
     this.subtextColor,
     this.bottomWidget,
-});
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -116,25 +116,17 @@ class VehicleListItem extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: TextStyle(
-                        fontSize: 32.0,
-                        color: titleColor
-                    ),
+                    style: TextStyle(fontSize: 32.0, color: titleColor),
                   ),
                   Text(
                     subtext1,
-                    style: TextStyle(
-                        fontSize: 18.0,
-                        color: subtextColor
-                    ),
+                    style: TextStyle(fontSize: 18.0, color: subtextColor),
                   ),
                 ],
               ),
             ],
           ),
-          Container(
-            child: bottomWidget
-          )
+          Container(child: bottomWidget)
         ],
       ),
     );

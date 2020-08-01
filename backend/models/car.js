@@ -17,7 +17,7 @@ const carSchema = new mongoose.Schema({
 
     lastTravelled: {
         type: String,
-        default: "Not Travelled"
+        default: "Never"
     },
 
     completedJourney: {

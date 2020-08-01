@@ -8,6 +8,50 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+class API {
+  static Future fetchDetails() {
+    print("dcdcfdvfvfv");
+    return http.get('http://localhost:4000/carList');
+    // if (response.statusCode == 200) {
+    //   return response;
+    // } else {
+    //   throw Exception('Failed to load album');
+    // }
+  }
+}
+
+class Cars {
+  final String carName;
+  final String lastTravelled;
+  final IconData icon;
+  final num completedJourney;
+  final num distanceCovered;
+
+  Cars({
+    this.carName = 'Car',
+    this.lastTravelled = 'Never',
+    this.icon = FontAwesomeIcons.car,
+    this.completedJourney = 0,
+    this.distanceCovered = 0,
+  });
+
+  Cars.fromJson(Map json)
+      : icon = FontAwesomeIcons.car,
+        carName = json['carName'],
+        lastTravelled = json['lastTravelled'],
+        completedJourney = json['completedJourney'],
+        distanceCovered = json["distanceCovered"];
+
+  Map toJson() {
+    return {
+      'carName': carName,
+      'lastTravelled': lastTravelled,
+      'completedJourney': completedJourney,
+      'distanceCovered': distanceCovered
+    };
+  }
+}
+
 class VehicleListScreen extends StatefulWidget {
   static String screenID = 'vehicle_list_screen';
   @override
@@ -16,45 +60,38 @@ class VehicleListScreen extends StatefulWidget {
 
 class _VehicleListScreenState extends State<VehicleListScreen> {
   // List<Vehicle> vehicleList = <Vehicle>[
-  //   Vehicle(
-  //     carName: 'MG Hector',
-  //     lastTravelled: '16 hours ago'
-  //   ),
-  //   Vehicle(
-  //     carName: 'Swift',
-  //     lastTravelled: 'Yesterday'
-  //   ),
-  //   Vehicle(
-  //     carName: 'Nixon',
-  //     lastTravelled: '10 days ago'
-  //   ),
+  //   Vehicle(carName: 'MG Hector', lastTravelled: '16 hours ago'),
+  //   Vehicle(carName: 'Swift', lastTravelled: 'Yesterday'),
+  //   Vehicle(carName: 'Nixon', lastTravelled: '10 days ago'),
   // ];
 
   int selectedVehicle = 0;
   bool moreVehicleDetails = true;
+  var listofcars = List<Cars>();
+  var listofvehicles = List<Vehicle>();
 
-  // Changes for backend
-
-  final String url = 'http://localhost:4000/carList';
-  List vehicleList;
+  fetchCarDetails() {
+    API.fetchDetails().then((response) {
+      setState(() {
+        Iterable list = json.decode(response.body);
+        listofcars = list.map((model) => Cars.fromJson(model)).toList();
+        for (var car in listofcars) {
+          listofvehicles.add(Vehicle(
+              carName: car.carName,
+              lastTravelled: car.lastTravelled,
+              distanceCovered: car.distanceCovered,
+              completedJourney: car.completedJourney,
+              icon: car.icon));
+        }
+        print(listofcars);
+        print(listofvehicles);
+      });
+    });
+  }
 
   void initstate() {
     super.initState();
-    this.getJsonData();
-  }
-
-  Future<String> getJsonData() async {
-    var response = await http
-        .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
-
-    print(response.body);
-
-    setState(() {
-      var converDataToJson = json.decode(response.body);
-      vehicleList = converDataToJson;
-    });
-
-    return "Success";
+    fetchCarDetails();
   }
 
   // upto here
@@ -93,11 +130,11 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          Vehicle newVehicle = await Navigator.push(context,
+          Vehicle newCar = await Navigator.push(context,
               MaterialPageRoute(builder: (context) => NewVehicleScreen()));
-          if (newVehicle != null) {
+          if (newCar != null) {
             setState(() {
-              vehicleList.add(newVehicle);
+              listofvehicles.add(newCar);
             });
           }
         },
@@ -105,7 +142,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
       ),
       body: ListView.separated(
         padding: EdgeInsets.all(10.0),
-        itemCount: vehicleList.length,
+        itemCount: listofcars.length,
         itemBuilder: (context, int index) {
           return GestureDetector(
               onTap: () {
@@ -119,7 +156,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
                   selectedVehicle = index;
                 });
               },
-              child: vehicleList[index].getVehicleAsListItem(
+              child: listofvehicles[index].getVehicleAsListItem(
                 selectedVehicle: index == selectedVehicle,
                 expandedVehicleDetails: moreVehicleDetails,
               ));
