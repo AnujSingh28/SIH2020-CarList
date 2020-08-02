@@ -16,6 +16,22 @@ class Vehicle {
     this.distanceCovered = 0,
   });
 
+  Vehicle.fromJson(Map json)
+      : icon = FontAwesomeIcons.car,
+        carName = json['carName'],
+        lastTravelled = json['lastTravelled'],
+        completedJourney = json['completedJourney'],
+        distanceCovered = json["distanceCovered"];
+
+  Map toJson() {
+    return {
+      'carName': carName,
+      'lastTravelled': lastTravelled,
+      'completedJourney': completedJourney,
+      'distanceCovered': distanceCovered
+    };
+  }
+
   Widget getVehicleAsListItem(
       {bool selectedVehicle = false, bool expandedVehicleDetails = false}) {
     return VehicleListItem(

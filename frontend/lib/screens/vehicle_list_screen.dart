@@ -1,3 +1,5 @@
+//import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sih2020/components/vehicle.dart';
@@ -5,51 +7,61 @@ import 'package:sih2020/components/side_menu_drawer.dart';
 import 'package:sih2020/screens/add_new_vehicle_screen.dart';
 
 import 'dart:async';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+// import 'package:http/http.dart' as http;
+// import 'dart:convert';
 
-class API {
-  static Future fetchDetails() {
-    print("dcdcfdvfvfv");
-    return http.get('http://localhost:4000/carList');
-    // if (response.statusCode == 200) {
-    //   return response;
-    // } else {
-    //   throw Exception('Failed to load album');
-    // }
+Future<List<Vehicle>> _getcars() async {
+  print("frst step");
+  // final url = 'http://localhost:4000/carList';
+  // final response = await http
+  //     .get(Uri.encodeFull(url), headers: {"accept": 'application/json'});
+
+  // print(response);
+  List response = [
+    {
+      "lastTravelled": "Not Travelled",
+      "completedJourney": 0,
+      "distanceCovered": 0,
+      "_id": "5f1da2833ee1476874461c84",
+      "name": "Lamborghini",
+      "fuelType": "Petrol",
+      "fuelTankSize": "infinite",
+      "__v": 0
+    },
+    {
+      "lastTravelled": "Not Travelled",
+      "completedJourney": 0,
+      "distanceCovered": 0,
+      "_id": "5f1da2a93ee1476874461c85",
+      "name": "Maserati",
+      "fuelType": "Petrol",
+      "fuelTankSize": "finite",
+      "__v": 0
+    },
+    {
+      "lastTravelled": "Never",
+      "completedJourney": 0,
+      "distanceCovered": 0,
+      "_id": "5f224c7f0dfa254a4c03dd53",
+      "name": "jazz",
+      "fuelType": "Petrol",
+      "fuelTankSize": "100L",
+      "__v": 0
+    }
+  ];
+  List<Vehicle> allvehicles = [];
+
+  for (var i in response) {
+    Vehicle vehi = Vehicle(
+        carName: i['carName'],
+        distanceCovered: i['distanceCovered'],
+        completedJourney: i['completedJourney'],
+        lastTravelled: i['lastTravelled']);
+
+    allvehicles.add(vehi);
   }
-}
 
-class Cars {
-  final String carName;
-  final String lastTravelled;
-  final IconData icon;
-  final num completedJourney;
-  final num distanceCovered;
-
-  Cars({
-    this.carName = 'Car',
-    this.lastTravelled = 'Never',
-    this.icon = FontAwesomeIcons.car,
-    this.completedJourney = 0,
-    this.distanceCovered = 0,
-  });
-
-  Cars.fromJson(Map json)
-      : icon = FontAwesomeIcons.car,
-        carName = json['carName'],
-        lastTravelled = json['lastTravelled'],
-        completedJourney = json['completedJourney'],
-        distanceCovered = json["distanceCovered"];
-
-  Map toJson() {
-    return {
-      'carName': carName,
-      'lastTravelled': lastTravelled,
-      'completedJourney': completedJourney,
-      'distanceCovered': distanceCovered
-    };
-  }
+  return allvehicles;
 }
 
 class VehicleListScreen extends StatefulWidget {
@@ -67,38 +79,17 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
   int selectedVehicle = 0;
   bool moreVehicleDetails = true;
-  var listofcars = List<Cars>();
   var listofvehicles = List<Vehicle>();
-
-  fetchCarDetails() {
-    API.fetchDetails().then((response) {
-      setState(() {
-        Iterable list = json.decode(response.body);
-        listofcars = list.map((model) => Cars.fromJson(model)).toList();
-        for (var car in listofcars) {
-          listofvehicles.add(Vehicle(
-              carName: car.carName,
-              lastTravelled: car.lastTravelled,
-              distanceCovered: car.distanceCovered,
-              completedJourney: car.completedJourney,
-              icon: car.icon));
-        }
-        print(listofcars);
-        print(listofvehicles);
-      });
-    });
-  }
+  Future<List<Vehicle>> futurecars;
 
   void initstate() {
     super.initState();
-    fetchCarDetails();
+    futurecars = _getcars();
   }
-
-  // upto here
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return new Scaffold(
       drawer: SideMenuDrawer(),
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -140,30 +131,30 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
         },
         child: Icon(FontAwesomeIcons.plus),
       ),
-      body: ListView.separated(
-        padding: EdgeInsets.all(10.0),
-        itemCount: listofcars.length,
-        itemBuilder: (context, int index) {
-          return GestureDetector(
-              onTap: () {
-                if (selectedVehicle == index && moreVehicleDetails == false) {
-                  moreVehicleDetails = true;
-                } else if (selectedVehicle == index &&
-                    moreVehicleDetails == true) {
-                  moreVehicleDetails = false;
-                }
-                setState(() {
-                  selectedVehicle = index;
-                });
-              },
-              child: listofvehicles[index].getVehicleAsListItem(
-                selectedVehicle: index == selectedVehicle,
-                expandedVehicleDetails: moreVehicleDetails,
-              ));
-        },
-        separatorBuilder: (context, int index) {
-          return Divider();
-        },
+      body: Container(
+        child: FutureBuilder(
+          future: _getcars(),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+            if (snapshot.data == null) {
+              print("vvdd");
+              return Container(
+                child: Center(
+                  child: Text("Loading..."),
+                ),
+              );
+            } else {
+              print("lll");
+              return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(snapshot.data[index].carName),
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
