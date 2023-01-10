@@ -15,6 +15,6 @@
     "express": "^4.17.1",
     "mongoose": "^5.9.25",
     "nodemon": "^2.0.4",
-    "stream-chat": "^1.14.0"
+    "stream-chat": "^8.2.1"
   }
 }
